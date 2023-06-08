@@ -215,3 +215,135 @@ def barzilai_borwein(fun, x, grad, tol=1e-6, maxit=50000):
         it = it + 1
         
     return x_old,grad_norm,it
+
+def dogleg(fun, x, grad, tol=1e-6, M=50000, E=1e-4):
+    
+    """
+	Parameters
+	----------
+		fun:callable
+			objective function
+		x:array
+			initial point
+		gradfun:callable
+			gradient of the objective function
+		tol:float
+			tolerance of the method (default is 1e-6)
+		maxit:int
+			maximum number of iterations
+
+	Returns
+	-------
+		tuple(x,grad_norm,it)
+			x:array
+				approximate minimizer or last iteration
+			grad_norm:float
+				norm of the gradient at x
+			it:int
+				number of iteration
+	"""
+
+
+    f = fun(x)
+    g = grad(x)
+    grad_norm = np.linalg.norm(g)
+    delta = min(grad_norm, 100)
+    NewPointFlag = True
+    it = 0
+    
+    while grad_norm>=tol and it<M:
+        print(it)
+        it = it + 1
+        
+        if NewPointFlag:
+            H = HessianApprox(f, x, g, grad, E)
+            
+            
+        mu = np.dot(g, np.dot(H, g))
+        mu1 = grad_norm**2
+        
+        TrialPointType = "Cauchy"
+        
+        BoundaryPointFlag = False
+        
+        if mu <= 0:
+            xcauchy = x-(delta*g)/grad_norm
+            BoundaryPointFlag = True
+        else:
+            o = min((delta/grad_norm),(mu1/mu))
+            
+            if mu1/mu >= delta/grad_norm:
+                BoundaryPointFlag = True
+                
+            xcauchy = x - o*g
+            Hinv = np.linalg.inv(H)
+            dnewton = np.dot(Hinv,g)
+            
+            if np.dot(dnewton,g) < 0:
+                xnewton = x + dnewton
+                
+                if np.linalg.norm(dnewton) <= delta:
+                    TrialPointType = "Newton"
+                    
+                    if np.linalg.norm(dnewton) >= delta - 1e-6:
+                        BoundaryPointFlag = True
+                else:
+                    if not BoundaryPointFlag:
+                        dcauchy = -o*g
+                        d = dnewton - dcauchy
+                        (a, b, c) = (np.linalg.norm(d)**2, 2*np.dot(dcauchy, d), (np.linalg.norm(dcauchy)**2)-(delta**2))
+                        E = (-b + np.sqrt((b**2)-4*a*c))/(2*a)
+                        xcauchy = xcauchy + E*(xnewton-xcauchy)
+                        BoundaryPointFlag = True
+                        TrialPointType = "Dogleg"
+        
+        if TrialPointType == "Newton":
+            xtrial = xnewton
+        else:
+            xtrial = xcauchy
+        
+        dtrial = xtrial - x
+        ftrial = fun(xtrial)
+        actual_reduction = ftrial - f
+        predicted_reduction = np.dot(g,dtrial)+((1/2)*np.dot(dtrial, np.dot(H, dtrial)))
+        ratio = actual_reduction/ predicted_reduction
+        
+        if ratio < 1e-4:
+            delta = (1/2)*min(delta, np.linalg.norm(dtrial))
+            NewPointFlag = False
+        else:
+            x = xtrial
+            NewPointFlag = True
+        
+        if ratio > 0.75 and BoundaryPointFlag:
+            delta = min(2*delta, 1000)
+            
+        if NewPointFlag:
+            f = fun(x)
+            g = grad(x)
+            grad_norm = np.linalg.norm(g)
+        
+        
+    return x,grad_norm,it
+
+def HessianApprox(f, x, g, grad, E):
+    n = 100
+    H = np.zeros((n, n))
+    
+    for j in range(0,99) :
+        e = np.zeros(n)
+        e[j] = 1
+        H[:, j] = HessianAction(f, x, e, g, grad, E)
+    
+    return ((H + np.transpose(H))/2)
+
+def HessianAction(f, x, d, g, grad, E):
+    d_norm = np.linalg.norm(d)
+    if d_norm == 0:
+        z = np.zeros(100)
+    else:
+        gE = grad((x+E*d)/d_norm)
+        z = (gE - g)/E
+    
+    return z
+    
