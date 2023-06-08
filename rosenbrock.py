@@ -6,7 +6,7 @@ Jan Catherine San Juan
 Date: 13 June 2023
 """
 import numpy as np
-from optrosen2 import fletcher_reeves, hager_zhang
+from optrosen2 import fletcher_reeves, hager_zhang, barzilai_borwein
 import sys
 
 def rosenbrock(x):
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     elif choice == 'Hager-Zhang NLCG' or choice == '2':		
         x, grad_norm, it = hager_zhang(rosenbrock, x, grad_rosenbrock)
     elif choice == 'Nonlinear Barzilai–Borwein Gradient' or choice == '3':		
-        print("insert function here hehe")
+        x, grad_norm, it = barzilai_borwein(rosenbrock, x, grad_rosenbrock)
     elif choice == 'BFGS Quasi-Newton' or choice == '4':		
         print("insert function here hehe")
     elif choice == 'Dogleg Trust Region' or choice == '5':		

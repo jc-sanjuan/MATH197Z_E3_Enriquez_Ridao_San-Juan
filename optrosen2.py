@@ -68,9 +68,9 @@ def fletcher_reeves(fun, x, grad, tol=1e-6, maxit=50000):
 		gradfun:callable
 			gradient of the objective function
 		tol:float
-			tolerance of the method (default is 1e-10)
+			tolerance of the method (default is 1e-6)
 		maxit:int
-			maximum number of iterationd
+			maximum number of iterations
 
 	Returns
 	-------
@@ -118,9 +118,9 @@ def hager_zhang(fun, x, grad, tol=1e-6, maxit=50000):
 		gradfun:callable
 			gradient of the objective function
 		tol:float
-			tolerance of the method (default is 1e-10)
+			tolerance of the method (default is 1e-6)
 		maxit:int
-			maximum number of iterationd
+			maximum number of iterations
 
 	Returns
 	-------
@@ -157,9 +157,61 @@ def hager_zhang(fun, x, grad, tol=1e-6, maxit=50000):
             d = np.negative(g) + np.dot(B,d)
         else:
             y = g - g_old
-            #B = (grad_norm**2)/(grad_normPrev**2)
             d = np.negative(g)
             
         it = it + 1
         
     return x,grad_norm,it
+
+def barzilai_borwein(fun, x, grad, tol=1e-6, maxit=50000):
+    
+    """
+	Parameters
+	----------
+		fun:callable
+			objective function
+		x:array
+			initial point
+		gradfun:callable
+			gradient of the objective function
+		tol:float
+			tolerance of the method (default is 1e-6)
+		maxit:int
+			maximum number of iterations
+
+	Returns
+	-------
+		tuple(x,grad_norm,it)
+			x:array
+				approximate minimizer or last iteration
+			grad_norm:float
+				norm of the gradient at x
+			it:int
+				number of iteration
+	"""
+
+
+    g_old = grad(x)
+    x_old = x
+    x = x_old - g_old
+    g = grad(x)
+    grad_norm = np.linalg.norm(g)
+    it = 1
+    
+    while grad_norm>=tol and it<maxit:
+        S = x - x_old
+        y = g - g_old
+        #y_norm = np.linalg.norm(y)
+        #alpha = (np.dot(S,y))/((y_norm)**2)
+        alpha = ((np.linalg.norm(S))**2)/(np.dot(y, S))
+        
+        x_old = x
+        x = x - alpha*g
+        
+        grad_norm = np.linalg.norm(g)
+        g_old = g
+        g = grad(x)
+        
+        it = it + 1
+        
+    return x_old,grad_norm,it
