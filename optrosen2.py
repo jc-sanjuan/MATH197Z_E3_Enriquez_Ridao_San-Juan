@@ -182,7 +182,7 @@ def barzilai_borwein(fun, x, grad, tol=1e-6, maxit=50000):
 	Returns
 	-------
 		tuple(x,grad_norm,it)
-			x:array
+			x_old:array
 				approximate minimizer or last iteration
 			grad_norm:float
 				norm of the gradient at x
@@ -286,7 +286,7 @@ def broyden_fgs(fun, x, grad, tol=1e-6, maxit=50000, nr=1e-8, na=1e-12):
     return x,grad_norm,it
 
 
-def dogleg(fun, x, grad, tol=1e-6, M=50000, E=0.1):
+def dogleg(fun, x, grad, tol=1e-6, M=50000, E=0.05):
     
     """
 	Parameters
@@ -299,8 +299,10 @@ def dogleg(fun, x, grad, tol=1e-6, M=50000, E=0.1):
 			gradient of the objective function
 		tol:float
 			tolerance of the method (default is 1e-6)
-		maxit:int
+		M:int
 			maximum number of iterations
+        E:float
+            difference increment
 
 	Returns
 	-------
@@ -397,6 +399,27 @@ def dogleg(fun, x, grad, tol=1e-6, M=50000, E=0.1):
     return x,grad_norm,it
 
 def HessianApprox(f, x, g, grad, E):
+    
+    """
+	Parameters
+	----------
+		f:array
+			objective function
+		x:array
+			initial point
+        g:array
+            gradient of the objective function
+		gradfun:callable
+			gradient of the objective function
+        E:float
+            difference increment
+
+	Returns
+	-------
+		((H + np.transpose(H))/2):matrix(nxn)
+            hessian approximation of the objective function
+	"""
+    
     n = 100
     H = np.zeros((n, n))
     
@@ -408,6 +431,27 @@ def HessianApprox(f, x, g, grad, E):
     return ((H + np.transpose(H))/2)
 
 def HessianAction(f, x, d, g, grad, E):
+    
+    """
+	Parameters
+	----------
+		f:array
+			objective function
+		x:array
+			initial point
+        g:array
+            gradient of the objective function
+		gradfun:callable
+			gradient of the objective function
+        E:float
+            difference increment
+
+	Returns
+	-------
+		z:array
+            column of the hessian approximation
+	"""
+    
     d_norm = np.linalg.norm(d)
     if d_norm == 0:
         z = np.zeros(100)
