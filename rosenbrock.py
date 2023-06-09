@@ -66,7 +66,7 @@ if __name__ == "__main__":
     elif choice == 'Nonlinear Barzilai–Borwein Gradient' or choice == '3':		
         x, grad_norm, it = barzilai_borwein(rosenbrock, x, grad_rosenbrock)
     elif choice == 'BFGS Quasi-Newton' or choice == '4':		
-        print("insert function here hehe")
+        x, grad_norm, it = broyden_fgs(rosenbrock, x, grad_rosenbrock)
     elif choice == 'Dogleg Trust Region' or choice == '5':		
         x, grad_norm, it = dogleg(rosenbrock, x, grad_rosenbrock)
     else:
