@@ -216,6 +216,73 @@ def barzilai_borwein(fun, x, grad, tol=1e-6, maxit=50000):
         
     return x_old,grad_norm,it
 
+
+
+def broyden_fgs(fun, x, grad, tol=1e-6, maxit=50000, nr=1e-8, na=1e-12):
+    
+    """
+	Parameters
+	----------
+		fun:callable
+			objective function
+		x:array
+			initial point
+		gradfun:callable
+			gradient of the objective function
+		tol:float
+			tolerance of the method (default is 1e-10)
+		maxit:int
+			maximum number of iterationd
+
+	Returns
+	-------
+		tuple(x,grad_norm,it)
+			x:array
+				approximate minimizer or last iteration
+			grad_norm:float
+				norm of the gradient at x
+			it:int
+				number of iteration
+	"""
+    f = fun(x)
+    g = grad(x)
+    grad_norm = np.linalg.norm(g)
+    I = np.identity(100)
+    B = I
+    it = 0
+    while grad_norm>=tol and it<maxit:
+        d = np.dot(np.negative(B),g)
+        alpha = backtracking(fun,d,x,f,-d)
+        
+        
+        s = alpha*d
+        g_old = g
+        x = x + s
+        g = grad(x)
+        grad_norm = np.linalg.norm(grad(x))
+        y = g - g_old
+        rho = np.dot(np.transpose(s),y)
+        
+        grad_s = np.linalg.norm(s)
+        grad_y = np.linalg.norm(y)
+        
+        #grad_normPrev = grad_norm
+        C = (np.dot(s,np.transpose(y))/rho)
+        D = (np.dot(y,np.transpose(s))/rho)
+        E = (np.dot(s,np.transpose(s))/rho)
+        F = I - C
+        G = I - D
+        
+        if rho < nr*np.dot(grad_s,grad_y) or rho < na:
+            B = I  
+        else:
+            
+            B = F*B*G + E
+        it = it + 1
+        
+    return x,grad_norm,it
+
+
 def dogleg(fun, x, grad, tol=1e-6, M=50000, E=1e-4):
     
     """
