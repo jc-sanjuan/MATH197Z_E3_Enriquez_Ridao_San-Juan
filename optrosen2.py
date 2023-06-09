@@ -201,9 +201,12 @@ def barzilai_borwein(fun, x, grad, tol=1e-6, maxit=50000):
     while grad_norm>=tol and it<maxit:
         S = x - x_old
         y = g - g_old
-        #y_norm = np.linalg.norm(y)
-        #alpha = (np.dot(S,y))/((y_norm)**2)
-        alpha = ((np.linalg.norm(S))**2)/(np.dot(y, S))
+        
+        if(it%2 == 0):
+            alpha = ((np.linalg.norm(S))**2)/(np.dot(y, S))
+        else:
+            y_norm = np.linalg.norm(y)
+            alpha = (np.dot(S,y))/((y_norm)**2)
         
         x_old = x
         x = x - alpha*g
