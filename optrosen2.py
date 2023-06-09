@@ -261,15 +261,15 @@ def broyden_fgs(fun, x, grad, tol=1e-6, maxit=50000, nr=1e-8, na=1e-12):
         g = grad(x)
         grad_norm = np.linalg.norm(grad(x))
         y = g - g_old
-        rho = np.dot(np.transpose(s),y)
+        rho = np.dot(s,y)
         
         grad_s = np.linalg.norm(s)
         grad_y = np.linalg.norm(y)
         
         #grad_normPrev = grad_norm
-        C = (np.dot(s,np.transpose(y))/rho)
-        D = (np.dot(y,np.transpose(s))/rho)
-        E = (np.dot(s,np.transpose(s))/rho)
+        C = (np.outer(s,y)/rho)
+        D = (np.outer(y,s)/rho)
+        E = (np.outer(s,s)/rho)
         F = I - C
         G = I - D
         
@@ -283,7 +283,7 @@ def broyden_fgs(fun, x, grad, tol=1e-6, maxit=50000, nr=1e-8, na=1e-12):
     return x,grad_norm,it
 
 
-def dogleg(fun, x, grad, tol=1e-6, M=50000, E=1e-4):
+def dogleg(fun, x, grad, tol=1e-6, M=50000, E=0.1):
     
     """
 	Parameters
@@ -319,7 +319,7 @@ def dogleg(fun, x, grad, tol=1e-6, M=50000, E=1e-4):
     it = 0
     
     while grad_norm>=tol and it<M:
-        print(it)
+        #print(it)
         it = it + 1
         
         if NewPointFlag:

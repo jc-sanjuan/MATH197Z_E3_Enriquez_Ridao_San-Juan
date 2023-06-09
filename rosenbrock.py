@@ -6,7 +6,7 @@ Jan Catherine San Juan
 Date: 13 June 2023
 """
 import numpy as np
-from optrosen2 import fletcher_reeves, hager_zhang, broyden_fgs, barzilai_borwein, dogleg, HessianApprox
+from optrosen2 import fletcher_reeves, hager_zhang, broyden_fgs, barzilai_borwein, dogleg
 import sys
 
 def rosenbrock(x):
