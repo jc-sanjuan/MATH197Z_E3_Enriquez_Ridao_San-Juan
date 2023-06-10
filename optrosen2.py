@@ -325,7 +325,7 @@ def dogleg(fun, x, grad, tol=1e-6, M=50000, E=0.05):
     it = 0
     
     while grad_norm>=tol and it<M:
-        print(it)
+        #print(it)
         it = it + 1
         
         if NewPointFlag:
