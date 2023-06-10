@@ -90,6 +90,7 @@ def fletcher_reeves(fun, x, grad, tol=1e-6, maxit=50000):
     d = np.negative(g)
     it = 0
     while grad_norm>=tol and it<maxit:
+        
         alpha = backtracking(fun,d,x,f,-d)
         
         grad_normPrev = grad_norm
@@ -255,6 +256,7 @@ def broyden_fgs(fun, x, grad, tol=1e-6, maxit=50000, nr=1e-8, na=1e-12):
     it = 0
     while grad_norm>=tol and it<maxit:
         d = np.dot(np.negative(B),g)
+        f = fun(x)
         alpha = backtracking(fun,d,x,f,-d)
         
         
@@ -276,11 +278,11 @@ def broyden_fgs(fun, x, grad, tol=1e-6, maxit=50000, nr=1e-8, na=1e-12):
         F = I - C
         G = I - D
         
-        if rho < nr*np.dot(grad_s,grad_y) or rho < na:
+        if rho < nr * grad_s * grad_y or rho < na:
             B = I  
         else:
             
-            B = F*B*G + E
+            B = np.dot(F, np.dot(B, G)) + E
         it = it + 1
         
     return x,grad_norm,it
@@ -314,8 +316,7 @@ def dogleg(fun, x, grad, tol=1e-6, M=50000, E=0.05):
 			it:int
 				number of iteration
 	"""
-
-
+    
     f = fun(x)
     g = grad(x)
     grad_norm = np.linalg.norm(g)
@@ -324,7 +325,7 @@ def dogleg(fun, x, grad, tol=1e-6, M=50000, E=0.05):
     it = 0
     
     while grad_norm>=tol and it<M:
-        #print(it)
+        print(it)
         it = it + 1
         
         if NewPointFlag:
