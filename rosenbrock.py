@@ -1,5 +1,5 @@
 """
-MATH 197 Z Exercise 3
+MATH 197 Z Exercise 3 and Final Exam
 Name: Deangelo Enriquez
 Raphaell Ridao
 Jan Catherine San Juan
